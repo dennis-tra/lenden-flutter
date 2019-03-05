@@ -1,0 +1,30 @@
+{
+  "name": "lenden-firestore-rules",
+  "version": "1.0.1",
+  "description": "Lenden firestore emulator testing, with TypeScript",
+  "license": "Apache-2.0",
+  "scripts": {
+    "format": "prettier --write **/*.ts",
+    "pretest": "tsc",
+    "setup:firestore": "firebase setup:emulators:firestore",
+    "serve:firestore": "firebase serve --only firestore",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "test": "FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts",
+    "test:AndalomReportsList": "npm run pretest && FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts -g AndalomReportsList"
+  },
+  "devDependencies": {
+    "@firebase/app-types": "^0.3.2",
+    "@firebase/testing": "0.5.1",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "5.2.5",
+    "chai": "^4.2.0",
+    "filesystem": "1.0.1",
+    "firebase-tools": "^6.2.2",
+    "mocha": "5.2.0",
+    "mocha-typescript": "1.1.17",
+    "prettier": "1.15.3",
+    "source-map-support": "0.5.9",
+    "ts-node": "7.0.1",
+    "typescript": "3.2.2"
+  }
+}
