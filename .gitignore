@@ -354,6 +354,12 @@ typings/
 # Compiled binaries
 **/ios/Runner.*
 
-# Rules
+# Firebase rules
 **.js
 **.js.map
+
+# Security
+**.p12
+**.pem
+**.pkey
+
