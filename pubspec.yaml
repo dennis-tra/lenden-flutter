@@ -24,6 +24,8 @@ dependencies:
   firebase_auth: "^0.8.1+4"
   redux_epics: "^0.10.2"
   rxdart: "^0.18.0"
+  shared_preferences: "^0.4.3"
+  redux_logging: "^0.3.0"
   firebase_messaging: "^4.0.0+1"
   cloud_firestore: "^0.9.5+2"
 
