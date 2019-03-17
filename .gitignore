@@ -357,6 +357,7 @@ typings/
 # Firebase rules
 **.js
 **.js.map
+**/GoogleService-Info.plist
 
 # Security
 **.p12
