@@ -41,10 +41,20 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
 
     const pairingsCol = firestore.collection("pairings");
 
-    // Check if the requesting user is already paired with another user different from the provided uid
+    // Check if the requesting users are already paired; if yes, answer idempotent with success
+    const pairings = await pairingsCol
+        .where(`${pairingsUserIdsField}.${pairerUID}`, "==", true)
+        .where(`${pairingsUserIdsField}.${paireeUID}`, "==", true)
+        .get()
+
+    if (!pairings.empty) {
+        return pairings.docs[0]
+    }
+
+    // Check if the requesting user is already paired with another user.
+    // If the user has a pairing with pairee we had returned above.
     const pairingsOfPairer = await pairingsCol
         .where(`${pairingsUserIdsField}.${pairerUID}`, "==", true)
-        .where(`${pairingsUserIdsField}.${paireeUID}`, "==", null)
         .get()
 
     if (!pairingsOfPairer.empty) {
@@ -56,7 +66,6 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
 
     const pairingsOfPairee = await pairingsCol
         .where(`${pairingsUserIdsField}.${paireeUID}`, "==", true)
-        .where(`${pairingsUserIdsField}.${pairerUID}`, "==", null)
         .get()
 
     if (!pairingsOfPairee.empty) {
