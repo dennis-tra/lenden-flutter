@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lenden/store/auth/actions.dart';
-import 'package:lenden/store/state.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:rxdart/rxdart.dart';
 
 Epic<AppState> createAuthStateEpic({FirebaseAuth firebaseAuth}) {
+import 'package:lenden/store/auth/actions.dart';
+import 'package:lenden/store/state.dart';
   firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   return (Stream<dynamic> actions, EpicStore<AppState> store) {

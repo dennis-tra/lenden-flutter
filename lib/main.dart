@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:lenden/screens/home.dart';
 import 'package:lenden/screens/loading.dart';

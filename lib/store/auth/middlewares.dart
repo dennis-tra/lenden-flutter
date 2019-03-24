@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:redux/redux.dart';
+
 import 'package:lenden/store/auth/actions.dart';
 import 'package:lenden/store/auth/state.dart';
 import 'package:lenden/store/state.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:redux/redux.dart';
 
 List<Middleware<AppState>> createAuthMiddleware({FirebaseAuth firebaseAuth}) {
   firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;

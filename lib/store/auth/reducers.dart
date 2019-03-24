@@ -1,6 +1,6 @@
+import 'package:redux/redux.dart';
 import 'package:lenden/store/auth/actions.dart';
 import 'package:lenden/store/auth/state.dart';
-import 'package:redux/redux.dart';
 
 final authReducers = combineReducers<AuthState>([
   TypedReducer<AuthState, AuthStateChanged>(_authStateChanged),
