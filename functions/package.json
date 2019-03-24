@@ -3,12 +3,10 @@
   "main": "index.js",
   "dependencies": {
     "firebase-admin": "~7.1.1",
-    "firebase-functions": "^2.2.1",
-    "uuid": "^3.3.2"
+    "firebase-functions": "^2.2.1"
   },
   "devDependencies": {
-    "@firebase/app-types": "^0.3.7",
-    "@types/uuid": "^3.4.4"
+    "@firebase/app-types": "^0.3.7"
   },
   "private": true
 }

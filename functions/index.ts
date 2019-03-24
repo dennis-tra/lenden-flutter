@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import * as uuid from 'uuid';
 
 const pairingsUserIdsField = "user_ids";
 
@@ -8,23 +7,6 @@ admin.initializeApp();
 
 const firestore = admin.firestore();
 firestore.settings({ timestampsInSnapshots: true });
-
-exports.generateQRCodeOnUserCreation = functions.auth.user().onCreate(async (user) => {
-
-    const userRef = firestore.collection("users").doc(user.uid);
-
-    const userDoc = await userRef.get();
-    if (userDoc.exists) {
-        return
-    }
-
-    await userRef.create({
-        qrCode: uuid.v4(),
-        updateAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    })
-
-});
 
 exports.pairUsers = functions.https.onCall(async (data, context) => {
 
