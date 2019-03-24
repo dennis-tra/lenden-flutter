@@ -21,6 +21,7 @@ Epic<AppState> observeTokenRefreshEpic({FirebaseMessaging firebaseMessaging}) {
     return Observable(actions)
         .ofType(TypeToken<StartObservingFCMTokenRefresh>())
         .switchMap((StartObservingFCMTokenRefresh action) {
+
       return Observable(firebaseMessaging.onTokenRefresh)
           .map((token) => FCMTokenRefreshed(token: token))
           .onErrorReturnWith((error) => FCMTokenRefreshed(error: error))
@@ -34,6 +35,7 @@ Epic<AppState> onTokenRefreshEpic(
     {Firestore firestore,
     FirebaseMessaging firebaseMessaging,
     FieldValue serverTimestamp}) {
+  
   firestore = firestore ?? Firestore.instance;
   serverTimestamp = serverTimestamp ?? FieldValue.serverTimestamp();
   firebaseMessaging = firebaseMessaging ?? FirebaseMessaging();
@@ -86,14 +88,12 @@ Epic<AppState> onTokenRefreshEpic(
         } else {
           await ref.setData({
             "fcmToken": token,
-            "subscription": {"numberPlate": null, "createdAt": null},
             "updatedAt": serverTimestamp,
             "createdAt": serverTimestamp
           });
         }
         return UserDataChanged(user: User.fromFirestore(userDoc));
       } catch (error) {
-        print("error $error");
         return UserDataChanged(error: error);
       }
     }).switchMap((future) => Observable.fromFuture(future));

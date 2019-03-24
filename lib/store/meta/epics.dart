@@ -9,13 +9,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:rxdart/rxdart.dart';
 
-Epic<AppState> metaStateEpic({Firestore firestore}) {
+Epic<AppState> metaEpics() {
+  return combineEpics([observeInitStateEpic()]);
+}
+
+Epic<AppState> observeInitStateEpic({Firestore firestore}) {
   firestore = firestore ?? Firestore.instance;
 
   return (Stream<dynamic> actions, EpicStore<AppState> store) {
     return Observable(actions)
         .ofType(TypeToken<StartObservingInitState>())
         .switchMap((StartObservingInitState action) {
+
       final actionLogInCompleted =
           Observable(actions).ofType(TypeToken<LogInCompleted>());
 

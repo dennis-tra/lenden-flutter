@@ -2,9 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:rxdart/rxdart.dart';
 
-Epic<AppState> createAuthStateEpic({FirebaseAuth firebaseAuth}) {
 import 'package:lenden/store/auth/actions.dart';
 import 'package:lenden/store/state.dart';
+
+Epic<AppState> authEpics() {
+  return combineEpics([observeAuthStateEpic()]);
+}
+
+Epic<AppState> observeAuthStateEpic({FirebaseAuth firebaseAuth}) {
   firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   return (Stream<dynamic> actions, EpicStore<AppState> store) {
@@ -14,8 +19,7 @@ import 'package:lenden/store/state.dart';
       return Observable(firebaseAuth.onAuthStateChanged)
           .map((FirebaseUser user) => AuthStateChanged(user: user))
           .onErrorReturnWith((error) => AuthStateChanged(error: error))
-          .takeUntil(
-              actions.where((action) => action is StopObservingAuthState));
+          .takeUntil(actions.where((action) => action is StopObservingAuthState));
     });
   };
 }

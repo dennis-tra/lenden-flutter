@@ -5,4 +5,4 @@ import 'package:lenden/store/meta/epics.dart';
 import 'package:redux_epics/redux_epics.dart';
 
 final appEpics = combineEpics<AppState>(
-    []..add(createAuthStateEpic())..add(userEpics())..add(metaStateEpic()));
+    []..add(authEpics())..add(userEpics())..add(metaEpics()));
