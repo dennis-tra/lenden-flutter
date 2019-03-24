@@ -354,7 +354,7 @@ typings/
 # Compiled binaries
 **/ios/Runner.*
 
-# Firebase rules
+# Firebase rules/functions
 **.js
 **.js.map
 **/GoogleService-Info.plist

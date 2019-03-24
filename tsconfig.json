@@ -4,6 +4,14 @@
         "module": "commonjs",
         "sourceMap": true,
         "experimentalDecorators": true,
-        "lib": [ "es6", "dom" ]
-    }
+        "lib": [
+            "es6",
+            "dom"
+        ]
+    },
+    "compileOnSave": true,
+    "include": [
+        "functions",
+        "rules"
+    ]
 }

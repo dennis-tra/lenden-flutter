@@ -1,8 +1,6 @@
 /// <reference path='../node_modules/mocha-typescript/globals.d.ts' />
 import * as firebase from "@firebase/testing";
 import * as fs from "fs";
-import { assert } from "chai";
-import { FieldPath, Timestamp, Firestore } from "@google-cloud/firestore";
 
 /*
  * ============
@@ -120,7 +118,7 @@ class LendenUserCreate extends TestingBase {
   @test
   async "can create user with null fcm token but not with empty"() {
     const db = authedApp({ uid: testUserId1 });
-    var ref = db.collection("users").doc(testUserId1);
+    const ref = db.collection("users").doc(testUserId1);
 
     await firebase.assertFails(ref.set({
       ...testUserData1,

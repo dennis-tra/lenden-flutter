@@ -5,26 +5,31 @@
   "license": "Apache-2.0",
   "scripts": {
     "format": "prettier --write **/*.ts",
-    "pretest": "tsc",
+    "build": "tsc",
+    "lint": "tslint --project tsconfig.json",
     "setup:firestore": "firebase setup:emulators:firestore",
+    "shell:functions": "npm run build && firebase functions:shell",
     "serve:firestore": "firebase serve --only firestore",
-    "deploy:rules": "firebase deploy --only firestore:rules",
-    "test": "FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts",
-    "test:AndalomReportsList": "npm run pretest && FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts -g AndalomReportsList"
+    "serve:functions": "npm run build && firebase serve --only functions",
+    "deploy:functions": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "test:rules": "npm run build && FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts",
+    "deploy:rules": "firebase deploy --only firestore:rules"
   },
   "devDependencies": {
-    "@firebase/app-types": "^0.3.2",
-    "@firebase/testing": "0.5.1",
+    "@firebase/app-types": "^0.3.7",
+    "@firebase/testing": "^0.7.7",
     "@types/chai": "^4.1.7",
-    "@types/mocha": "5.2.5",
+    "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
     "filesystem": "1.0.1",
-    "firebase-tools": "^6.2.2",
-    "mocha": "5.2.0",
-    "mocha-typescript": "1.1.17",
-    "prettier": "1.15.3",
-    "source-map-support": "0.5.9",
-    "ts-node": "7.0.1",
-    "typescript": "3.2.2"
+    "firebase-tools": "^6.5.0",
+    "mocha": "^6.0.2",
+    "mocha-typescript": "^1.1.17",
+    "prettier": "^1.16.4",
+    "source-map-support": "^0.5.11",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4",
+    "tslint": "^5.14.0"
   }
 }
