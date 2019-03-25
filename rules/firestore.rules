@@ -19,6 +19,10 @@ service cloud.firestore {
       return request.resource.data;
     }
 
+    function existingData() {
+      return resource.data;
+    }
+
     match /users/{userId} {
       allow get: if isAuthenticated()
                  && isOwner(userId);
@@ -30,6 +34,11 @@ service cloud.firestore {
       allow update: if isAuthenticated()
               && isOwner(userId)
               && isUserData(incomingData());
+    }
+
+    match /pairings/{pairingId} {
+      allow list: if isAuthenticated() 
+                  && existingData().user_ids[request.auth.uid] == true;
     }
   }
 }

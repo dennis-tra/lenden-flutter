@@ -21,6 +21,15 @@ const testUserData2 = {
   "fcmToken": "TEST_FCM_TOKEN_2",
 };
 
+const testPairingsId = "testpairingid"
+const testPairingsData = {
+  "user_ids": {
+    [testUserId1]: true,
+    [testUserId2]: true
+  }
+}
+
+
 // Run each test in its own project id to make it independent.
 let testNumber = 0;
 
@@ -244,5 +253,47 @@ class LendenUserUpdate extends TestingBase {
     await firebase.assertSucceeds(ref.update({
       fcmToken: null,
     }));
+  }
+}
+
+@suite
+class LendenPairingsReadList extends TestingBase {
+  async before() {
+    await super.before();
+
+    const db = adminApp();
+    const ref = db.collection("pairings").doc(testPairingsId);
+    await ref.set(testPairingsData)
+  }
+
+  @test
+  async "require users to log in before reading pairings data"() {
+    const db = authedApp(null);
+    const ref = db.collection("pairings").doc(testPairingsId);
+
+    await firebase.assertFails(ref.get());
+  }
+
+  @test
+  async "users can not read another single pairing"() {
+    const db = authedApp({ uid: testUserId1 });
+    const ref = db.collection("pairings").doc("some-other-id");
+
+    await firebase.assertFails(ref.get());
+  }
+
+  @test
+  async "users can not list an arbitrary amount of pairings"() {
+    const db = authedApp({ uid: testUserId1 });
+
+    await firebase.assertFails(db.collection("pairings").get());
+  }
+
+  @test
+  async "users can list their own pairings"() {
+    const db = authedApp({ uid: testUserId1 });
+    const ref = db.collection("pairings").where(`user_ids.${testUserId1}`, "==", true);
+
+    await firebase.assertSucceeds(ref.get());
   }
 }
