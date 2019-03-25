@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:lenden/store/state.dart';
 import 'package:lenden/store/user/actions.dart';
+import 'package:lenden/store/pairing/actions.dart';
 import 'package:redux/redux.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
@@ -12,8 +13,14 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StoreBuilder(
-      onInit: (store) => store.dispatch(StartObservingUserData()),
-      onDispose: (store) => store.dispatch(StartObservingUserData()),
+      onInit: (store) {
+        store.dispatch(StartObservingUserData());
+        store.dispatch(StartObservingPairingState());
+      },
+      onDispose: (store) {
+        store.dispatch(StopObservingUserData());
+        store.dispatch(StopObservingPairingState());
+      },
       builder: (context, Store<AppState> store) {
         return Scaffold(
           body: Container(
@@ -32,7 +39,10 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text("Pair Lenden with your friend by scanning the QR-Code on either phone", textAlign: TextAlign.center,),
+                Text(
+                  "Pair Lenden with your friend by scanning the QR-Code on either phone",
+                  textAlign: TextAlign.center,
+                ),
                 QrImage(
                   foregroundColor: Colors.black87,
                   data: store.state.auth.user.uid,
@@ -46,14 +56,19 @@ class HomeScreen extends StatelessWidget {
 //
 //                      var userID = qrCode; // exchange with QR-Code parsing of URL
                       var userID = "Plb7ZfGb06fsY1ogEeY3rI5J1Vf1";
-                      dynamic resp = await CloudFunctions.instance.call(functionName: 'pairUsers',parameters: {
+                      dynamic resp = await CloudFunctions.instance
+                          .call(functionName: 'pairUsers', parameters: {
                         "uid": userID,
                       });
                       print(resp);
-                    } on CloudFunctionsException catch(e) {
+                    } on CloudFunctionsException catch (e) {
                       print(e.message);
                     }
                   },
+                ),
+                Text(
+                  "${store.state.pairing.pairing}",
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
