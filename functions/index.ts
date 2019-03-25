@@ -75,10 +75,12 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
         );
     }
 
-    return await pairingsCol.add({
+    const pairing = await pairingsCol.add({
         [pairingsUserIdsField]: {
             [pairerUID]: true,
             [paireeUID]: true,
         }
     })
+
+    return pairing.get()
 });
