@@ -32,10 +32,24 @@ Epic<AppState> observePairingStateEpic({Firestore firestore}) {
                 .collection("pairings")
                 .where("user_ids.${user.uid}", isEqualTo: true)
                 .snapshots())
-            .where((QuerySnapshot q) => q.documents.length == 1)
-            .map((QuerySnapshot q) => q.documents[0])
-            .map(Pairing.fromFirestore)
-            .map((Pairing pairing) => PairingStateChanged(pairing: pairing))
+            .map((QuerySnapshot q) {
+              final pairingsCount = q.documents.length;
+
+              if (pairingsCount == 1) {
+                final pairing = Pairing.fromFirestore(q.documents[0]);
+                if (pairing.userIds.length == 2) {
+                  return PairingStateChanged(pairing: pairing);
+                } else {
+                  final e = "Found pairing with unsupported amount of user ids";
+                  return PairingStateChanged(error: e);
+                }
+              } else if (pairingsCount > 1) {
+                return PairingStateChanged(
+                    error: "Found ${q.documents.length} pairings");
+              } else {
+                return PairingStateChanged();
+              }
+            })
             .onErrorReturnWith((error) => PairingStateChanged(error: error))
             .takeUntil(actions.where((action) =>
                 action is StopObservingPairingState ||

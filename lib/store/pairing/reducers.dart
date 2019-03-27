@@ -11,16 +11,19 @@ final pairingReducers = combineReducers<PairingState>([
 ]);
 
 PairingState _pairingStateChanged(
-    PairingState metaState, PairingStateChanged action) {
-  return metaState.copyWith(pairing: action.pairing, error: action.error);
+    PairingState pairingState, PairingStateChanged action) {
+  return PairingState(
+      pairing: action.pairing,
+      error: action.error,
+      status: pairingState.status);
 }
 
 PairingState _startObservingPairingState(
-    PairingState metaState, StartObservingPairingState action) {
-  return metaState.copyWith(status: Status.Watching);
+    PairingState pairingState, StartObservingPairingState action) {
+  return pairingState.copyWith(status: Status.Watching);
 }
 
 PairingState _stopObservingPairingState(
-    PairingState metaState, StopObservingPairingState action) {
-  return metaState.copyWith(status: Status.Idle);
+    PairingState pairingState, StopObservingPairingState action) {
+  return pairingState.copyWith(status: Status.Idle);
 }
