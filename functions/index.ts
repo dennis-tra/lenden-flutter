@@ -30,6 +30,13 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
         );
     }
 
+    if (pairerUID == paireeUID) {
+        throw new functions.https.HttpsError(
+            'invalid-argument',
+            'You cannot be paired with yourself.'
+        );
+    }
+
     try {
         await admin.auth().getUser(paireeUID)
     } catch (error) {
