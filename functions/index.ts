@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-const pairingsUserIdsField = "user_ids";
+const pairingsUserIdsField = 'user_ids';
 
 admin.initializeApp();
 
@@ -30,7 +30,7 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
         );
     }
 
-    if (pairerUID == paireeUID) {
+    if (pairerUID === paireeUID) {
         throw new functions.https.HttpsError(
             'invalid-argument',
             'You cannot be paired with yourself.'
@@ -46,12 +46,12 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
         );
     }
 
-    const pairingsCol = firestore.collection("pairings");
+    const pairingsCol = firestore.collection('pairings');
 
     // Check if the requesting users are already paired; if yes, answer idempotent with success
     const pairings = await pairingsCol
-        .where(`${pairingsUserIdsField}.${pairerUID}`, "==", true)
-        .where(`${pairingsUserIdsField}.${paireeUID}`, "==", true)
+        .where(`${pairingsUserIdsField}.${pairerUID}`, '==', true)
+        .where(`${pairingsUserIdsField}.${paireeUID}`, '==', true)
         .get()
 
     if (!pairings.empty) {
@@ -61,7 +61,7 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
     // Check if the requesting user is already paired with another user.
     // If the user has a pairing with pairee we had returned above.
     const pairingsOfPairer = await pairingsCol
-        .where(`${pairingsUserIdsField}.${pairerUID}`, "==", true)
+        .where(`${pairingsUserIdsField}.${pairerUID}`, '==', true)
         .get()
 
     if (!pairingsOfPairer.empty) {
@@ -72,7 +72,7 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
     }
 
     const pairingsOfPairee = await pairingsCol
-        .where(`${pairingsUserIdsField}.${paireeUID}`, "==", true)
+        .where(`${pairingsUserIdsField}.${paireeUID}`, '==', true)
         .get()
 
     if (!pairingsOfPairee.empty) {
@@ -90,4 +90,82 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
     })
 
     return pairing.get()
+});
+
+
+exports.sendPushNotification = functions.https.onCall(async (data, context) => {
+
+    if (!context.auth) {
+        throw new functions.https.HttpsError(
+            'failed-precondition',
+            'The pairing function must be called while authenticated.'
+        );
+    }
+
+    // the user who has initiated the pairing process
+    const senderUID = context.auth.uid
+
+    const pairingsCol = firestore.collection('pairings');
+
+    // Check if the requesting users are already paired; if yes, answer idempotent with success
+    const pairings = await pairingsCol
+        .where(`${pairingsUserIdsField}.${senderUID}`, '==', true)
+        .get()
+
+
+    if (pairings.empty) {
+        throw new functions.https.HttpsError(
+            'failed-precondition',
+            'You are not paired to any other user.'
+        );
+    }
+
+    if (pairings.docs.length > 1) {
+        throw new functions.https.HttpsError(
+            'failed-precondition',
+            'You are paired to more than one user.'
+        );
+    }
+
+    try {
+        const pairing = pairings.docs[0].data();
+
+        const sendees: Array<string> = Object.keys(pairing[pairingsUserIdsField]).filter(k => k !== senderUID);
+
+
+        if (sendees.length !== 1) {
+            throw new functions.https.HttpsError(
+                'failed-precondition',
+                'You are paired to more than one user.'
+            );
+        }
+
+        const sendee = sendees[0];
+
+        const userDoc = await firestore.doc(`users/${sendee}`).get();
+        const user = userDoc.data();
+
+        if (sendees.length !== 1) {
+            throw new functions.https.HttpsError(
+                'failed-precondition',
+                'You are paired to more than one user.'
+            );
+        }
+
+        const message = {
+            notification: {
+                title: '🍺🍺🍺🍺🍺🍺',
+                body: 'test text',
+            },
+        };
+
+        const response = await admin.messaging().sendToDevice(user['fcmToken'], message);
+
+    } catch (error) {
+        throw new functions.https.HttpsError(
+            'internal',
+            `Could not send message: ${error}`
+        );
+    }
+
 });
