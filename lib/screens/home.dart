@@ -43,6 +43,15 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text("Lenden"),
+            actions: <Widget>[
+              // action button
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  store.dispatch(Unpair());
+                },
+              ),
+            ],
           ),
           key: scaffoldKey,
           body: Container(

@@ -37,6 +37,7 @@ service cloud.firestore {
     }
 
     match /pairings/{pairingId} {
+      allow delete: if true;
       allow list: if isAuthenticated() 
                   && existingData().user_ids[request.auth.uid] == true;
     }
