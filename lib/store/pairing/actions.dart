@@ -9,3 +9,20 @@ class PairingStateChanged {
 }
 
 class StopObservingPairingState {}
+
+class Pair {
+  final String uid;
+  Pair({this.uid});
+}
+
+class PairCompleted {
+  final dynamic error;
+  PairCompleted({this.error});
+}
+
+class Unpair {}
+
+class UnpairCompleted {
+  final dynamic error;
+  UnpairCompleted({this.error});
+}

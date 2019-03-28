@@ -1,18 +1,21 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:lenden/store/state.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:lenden/store/user/actions.dart';
 import 'package:lenden/store/pairing/actions.dart';
+import 'package:lenden/store/pairing/selectors.dart';
+import 'package:lenden/store/pairing/state.dart';
+import 'package:lenden/main.dart';
 import 'package:redux/redux.dart';
-import 'package:flutter/services.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-
-final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+import 'package:lenden/widgets/organisms/home_unpaired.dart';
+import 'package:lenden/widgets/organisms/home_paired.dart';
 
 class HomeScreen extends StatelessWidget {
+  final AudioPlayer audioPlayer;
+
+  const HomeScreen(this.audioPlayer);
+
   @override
   Widget build(BuildContext context) {
     return StoreBuilder(
@@ -25,10 +28,25 @@ class HomeScreen extends StatelessWidget {
         store.dispatch(StopObservingPairingState());
       },
       builder: (context, Store<AppState> store) {
+        Widget home;
+        if (store.state.pairing.process == Process.Orienting) {
+          home = CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(
+                Theme.of(context).primaryColor),
+          );
+        } else if (isPaired(store.state.pairing)) {
+          home = HomePaired(this.audioPlayer);
+        } else {
+          home = HomeUnpaired();
+        }
+
         return Scaffold(
-          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text("Lenden"),
+          ),
+          key: scaffoldKey,
           body: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(50.0),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -40,99 +58,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            child: store.state.pairing.pairing == null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Pair Lenden with your friend by scanning the QR-Code on either phone",
-                        textAlign: TextAlign.center,
-                      ),
-                      QrImage(
-                        foregroundColor: Colors.black87,
-                        data: store.state.auth.user.uid,
-                        size: 200.0,
-                      ),
-                      FlatButton(
-                        child: Text("Scan QR-Code"),
-                        onPressed: () async {
-                          try {
-                            final qrCode = await BarcodeScanner.scan();
-                            final userID = qrCode;
-
-                            await CloudFunctions.instance
-                                .call(functionName: 'pairUsers', parameters: {
-                              "uid": userID,
-                            });
-
-                            final _firebaseMessaging = FirebaseMessaging();
-                            _firebaseMessaging.requestNotificationPermissions();
-                          } on CloudFunctionsException catch (e) {
-                            String errorMsg;
-                            switch (e.code) {
-                              case "NOT_FOUND":
-                                errorMsg =
-                                    "The provided QR-Code seems invalid.";
-                                break;
-                              default:
-                                errorMsg = e.message;
-                            }
-
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text('Error: ${errorMsg}'),
-                              duration: Duration(seconds: 5),
-                            ));
-                          } on PlatformException catch (e) {
-                            if (e.code == BarcodeScanner.CameraAccessDenied) {
-                              _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                content: Text(
-                                    "📷 Please grant camera access by navigating to Settings -> Lenden and there toggling the 'Camera' switch"),
-                                duration: Duration(seconds: 10),
-                              ));
-                            } else {
-                              _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                content: Text("Hmm!"),
-                                duration: Duration(seconds: 5),
-                              ));
-                            }
-                          } on FormatException {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text("FormatException."),
-                              duration: Duration(seconds: 5),
-                            ));
-                          } on Exception catch (e) {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(
-                                  "💥💥💥 - Something went wrong with pairing your phone. Have a 🍺 and calm down."),
-                              duration: Duration(seconds: 5),
-                            ));
-                          }
-                        },
-                      ),
-                      Text(
-                        "${store.state.pairing.pairing}",
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                        Text("Connected!"),
-                        FlatButton(
-                          child: Text(
-                            "🍺",
-                          ),
-                          onPressed: () async {
-                            await CloudFunctions.instance
-                                .call(functionName: 'sendPushNotification');
-                          },
-                        ),
-                        Text(
-                          "${store.state.pairing.pairing}",
-                          textAlign: TextAlign.center,
-                        ),
-                      ]),
+            child: home,
           ),
         );
       },

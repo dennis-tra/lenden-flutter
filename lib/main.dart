@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'package:lenden/screens/home.dart';
 import 'package:lenden/screens/loading.dart';
@@ -14,6 +15,7 @@ import 'package:lenden/store/prefs/actions.dart';
 import 'package:lenden/store/state.dart';
 import 'package:lenden/store/reducers.dart';
 
+final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() => runApp(MainApp());
@@ -24,6 +26,8 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> {
+  final AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
   final store = Store<AppState>(
     appReducer,
     initialState: AppState.initialState(),
@@ -42,19 +46,26 @@ class MainAppState extends State<MainApp> {
   }
 
   @override
+  void dispose() {
+    audioPlayer.stop();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StoreProvider(
       store: store,
       child: MaterialApp(
         theme: ThemeData(
-          primaryColor: Color(0xFF3E4F87),
+          primaryColor: Color(0xFFBA5F0D),
+          accentColor: Colors.white,
           fontFamily: "Roboto",
         ),
         navigatorKey: navigatorKey,
         title: 'Lenden',
         home: LoadingScreen(),
         routes: <String, WidgetBuilder>{
-          '/home': (BuildContext context) => HomeScreen(),
+          '/home': (BuildContext context) => HomeScreen(this.audioPlayer),
         },
       ),
     );
