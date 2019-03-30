@@ -4,14 +4,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 import 'package:lenden/screens/home.dart';
-import 'package:lenden/screens/loading.dart';
 import 'package:lenden/store/auth/actions.dart';
 import 'package:lenden/store/epics.dart';
 import 'package:lenden/store/middlewares.dart';
 import 'package:lenden/store/prefs/actions.dart';
+import 'package:lenden/store/meta/actions.dart';
 import 'package:lenden/store/state.dart';
 import 'package:lenden/store/reducers.dart';
 
@@ -26,8 +25,6 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> {
-  final AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-
   final store = Store<AppState>(
     appReducer,
     initialState: AppState.initialState(),
@@ -43,11 +40,11 @@ class MainAppState extends State<MainApp> {
 
     store.dispatch(LoadPreferences());
     store.dispatch(LogIn());
+    store.dispatch(InitAudioplayer());
   }
 
   @override
   void dispose() {
-    audioPlayer.stop();
     super.dispose();
   }
 
@@ -63,10 +60,7 @@ class MainAppState extends State<MainApp> {
         ),
         navigatorKey: navigatorKey,
         title: 'Lenden',
-        home: LoadingScreen(),
-        routes: <String, WidgetBuilder>{
-          '/home': (BuildContext context) => HomeScreen(this.audioPlayer),
-        },
+        home: HomeScreen(),
       ),
     );
   }

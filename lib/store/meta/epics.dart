@@ -20,7 +20,6 @@ Epic<AppState> observeInitStateEpic({Firestore firestore}) {
     return Observable(actions)
         .ofType(TypeToken<StartObservingInitState>())
         .switchMap((StartObservingInitState action) {
-
       final actionLogInCompleted =
           Observable(actions).ofType(TypeToken<LogInCompleted>());
 
@@ -29,6 +28,15 @@ Epic<AppState> observeInitStateEpic({Firestore firestore}) {
 
       final logInObservable =
           Observable.merge([actionLogInCompleted, stateLogInCompleted]);
+
+      final actionSavePlopSoundCompleted =
+          Observable(actions).ofType(TypeToken<InitAudioplayerCompleted>());
+
+      final stateSavePlopSoundCompleted = Observable.just(store.state.meta)
+          .where((auth) => auth.plopFilePath.isNotEmpty);
+
+      final savePlopSoundObservable = Observable.merge(
+          [actionSavePlopSoundCompleted, stateSavePlopSoundCompleted]);
 
       final actionLoadPreferencesCompleted =
           Observable(actions).ofType(TypeToken<LoadPreferencesCompleted>());
@@ -46,12 +54,12 @@ Epic<AppState> observeInitStateEpic({Firestore firestore}) {
       final firestoreSettingsObservable = Observable.fromFuture(
           firestore.settings(timestampsInSnapshotsEnabled: true));
 
-      return Observable.combineLatest3(
+      return Observable.combineLatest4(
+              savePlopSoundObservable,
               firestoreSettingsObservable,
               logInObservable,
               preferencesObservable,
-              (_, __, LoadPreferencesCompleted prefs) => prefs.launchCount)
-          .doOnData((int launchCount) => navigateTo("/home"))
+              (_, __, ___, LoadPreferencesCompleted prefs) => prefs.launchCount)
           .map((_) => InitCompleted())
           .onErrorReturnWith((error) => InitCompleted())
           .take(1)
@@ -59,8 +67,4 @@ Epic<AppState> observeInitStateEpic({Firestore firestore}) {
               actions.where((action) => action is StopObservingInitState));
     });
   };
-}
-
-navigateTo(String route) {
-  navigatorKey.currentState.pushReplacementNamed(route);
 }

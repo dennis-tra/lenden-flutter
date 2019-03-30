@@ -51,9 +51,8 @@ Epic<AppState> observePairingStateEpic({Firestore firestore}) {
               }
             })
             .onErrorReturnWith((error) => PairingStateChanged(error: error))
-            .takeUntil(actions.where((action) =>
-                action is StopObservingPairingState ||
-                (action is AuthStateChanged && action.user == null)));
+            .takeUntil(
+                actions.where((action) => action is StopObservingPairingState));
       }).takeUntil(
               actions.where((action) => action is StopObservingPairingState));
     });

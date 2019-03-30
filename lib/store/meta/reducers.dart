@@ -6,6 +6,7 @@ final metaReducers = combineReducers<MetaState>([
   TypedReducer<MetaState, InitCompleted>(_userDataChanged),
   TypedReducer<MetaState, StartObservingInitState>(_startObservingInitState),
   TypedReducer<MetaState, StopObservingInitState>(_stopObservingInitState),
+  TypedReducer<MetaState, InitAudioplayerCompleted>(_initAudioplayerCompleted),
 ]);
 
 MetaState _userDataChanged(MetaState metaState, InitCompleted action) {
@@ -20,4 +21,10 @@ MetaState _startObservingInitState(
 MetaState _stopObservingInitState(
     MetaState metaState, StopObservingInitState action) {
   return metaState;
+}
+
+MetaState _initAudioplayerCompleted(
+    MetaState metaState, InitAudioplayerCompleted action) {
+  return metaState.copyWith(
+      audioPlayer: action.audioPlayer, plopFilePath: action.plopFile);
 }

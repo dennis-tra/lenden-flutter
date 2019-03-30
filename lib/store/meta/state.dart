@@ -1,14 +1,23 @@
+import 'package:audioplayers/audioplayers.dart';
+
 enum InitState { Unknown, Loading, Loaded }
 
 class MetaState {
   final InitState initState;
+  final AudioPlayer audioPlayer;
+  final String plopFilePath;
 
-  MetaState({this.initState = InitState.Unknown});
+  MetaState(
+      {this.initState = InitState.Unknown,
+      this.audioPlayer,
+      this.plopFilePath});
 
-  MetaState copyWith({InitState initState}) {
+  MetaState copyWith(
+      {InitState initState, AudioPlayer audioPlayer, String plopFilePath}) {
     return MetaState(
-      initState: initState ?? this.initState,
-    );
+        initState: initState ?? this.initState,
+        audioPlayer: audioPlayer ?? this.audioPlayer,
+        plopFilePath: plopFilePath ?? this.plopFilePath);
   }
 
   static MetaState initialState() {
@@ -17,6 +26,6 @@ class MetaState {
 
   @override
   String toString() {
-    return "MetaState{initState: $initState}";
+    return "MetaState{initState: $initState, audioPlayer: $audioPlayer, plopFilePath: $plopFilePath}";
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:lenden/store/meta/actions.dart';
+import 'package:lenden/store/meta/state.dart';
 import 'package:lenden/store/state.dart';
 import 'package:lenden/store/user/actions.dart';
 import 'package:lenden/store/pairing/actions.dart';
@@ -12,30 +13,38 @@ import 'package:lenden/widgets/organisms/home_unpaired.dart';
 import 'package:lenden/widgets/organisms/home_paired.dart';
 
 class HomeScreen extends StatelessWidget {
-  final AudioPlayer audioPlayer;
-
-  const HomeScreen(this.audioPlayer);
+  const HomeScreen();
 
   @override
   Widget build(BuildContext context) {
     return StoreBuilder(
       onInit: (store) {
+        store.dispatch(StartObservingInitState());
         store.dispatch(StartObservingUserData());
         store.dispatch(StartObservingPairingState());
       },
       onDispose: (store) {
+        store.dispatch(StopObservingInitState());
         store.dispatch(StopObservingUserData());
         store.dispatch(StopObservingPairingState());
       },
       builder: (context, Store<AppState> store) {
         Widget home;
-        if (store.state.pairing.process == Process.Orienting) {
-          home = CircularProgressIndicator(
-            valueColor: new AlwaysStoppedAnimation<Color>(
-                Theme.of(context).primaryColor),
+
+        if (store.state.meta.initState != InitState.Loaded ||
+            store.state.pairing.process == Process.Orienting) {
+          home = Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(),
+              CircularProgressIndicator(
+                valueColor: new AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor),
+              ),
+            ],
           );
         } else if (isPaired(store.state.pairing)) {
-          home = HomePaired(this.audioPlayer);
+          home = HomePaired();
         } else {
           home = HomeUnpaired();
         }
@@ -44,13 +53,47 @@ class HomeScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text("Lenden"),
             actions: <Widget>[
-              // action button
-              IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  store.dispatch(Unpair());
-                },
-              ),
+              Visibility(
+                visible: isPaired(store.state.pairing),
+                child: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Unpairing?"),
+                          content:
+                              Text("Do you really want to remove the pairing?"),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text(
+                                "No",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            FlatButton(
+                              child: Text("Yes",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  )),
+                              onPressed: () {
+                                store.dispatch(Unpair());
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              )
             ],
           ),
           key: scaffoldKey,
