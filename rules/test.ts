@@ -297,3 +297,49 @@ class LendenPairingsReadList extends TestingBase {
     await firebase.assertSucceeds(ref.get());
   }
 }
+
+
+@suite
+class LendenPairingsDelete extends TestingBase {
+  async before() {
+    await super.before();
+
+    const db = adminApp();
+    const ref = db.collection("pairings").doc(testPairingsId);
+    await ref.set(testPairingsData)
+
+    const ref2 = db.collection("pairings").doc("other-pairing-id");
+    await ref2.set({
+      ...testPairingsData,
+      "user_ids": {
+        "other-user-1": "other-user-id-1",
+        "other-user-2": "other-user-id-2",
+      }
+    })
+  }
+
+  @test
+  async "require users to log in before being able to delete pairings data"() {
+    const db = authedApp(null);
+    const ref = db.collection("pairings").doc(testPairingsId);
+
+    await firebase.assertFails(ref.delete());
+  }
+
+  @test
+  async "users can delete their own pairings"() {
+    const db = authedApp({ uid: testUserId1 });
+    const ref = db.collection("pairings").doc(testPairingsId);
+
+    await firebase.assertSucceeds(ref.delete());
+  }
+
+  @test
+  async "users cannot delete pairings from other users"() {
+    const db = authedApp({ uid: testUserId1 });
+    const ref = db.collection("pairings").doc("other-pairing-id");
+
+    await firebase.assertFails(ref.delete());
+  }
+
+}
