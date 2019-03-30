@@ -39,6 +39,7 @@ class MainAppState extends State<MainApp> {
     super.initState();
 
     store.dispatch(LoadPreferences());
+    store.dispatch(StartObservingAuthState());
     store.dispatch(LogIn());
     store.dispatch(InitAudioplayer());
   }
