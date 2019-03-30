@@ -30,6 +30,12 @@ Epic<AppState> observeTokenRefreshEpic({FirebaseMessaging firebaseMessaging}) {
   };
 }
 
+class TokenRefresh {
+  final String token;
+  final FirebaseUser user;
+  TokenRefresh({this.token, this.user});
+}
+
 Epic<AppState> onTokenRefreshEpic(
     {Firestore firestore,
     FirebaseMessaging firebaseMessaging,
@@ -39,23 +45,16 @@ Epic<AppState> onTokenRefreshEpic(
   firebaseMessaging = firebaseMessaging ?? FirebaseMessaging();
 
   return (Stream<dynamic> actions, EpicStore<AppState> store) {
-    final logInObservable = Observable(actions)
+    final userObservable = Observable(actions)
         .ofType(TypeToken<LogInCompleted>())
         .map((LogInCompleted login) => login.user)
-        .startWith(store.state.auth.user);
-
-    final logOutObservable = Observable(actions)
-        .ofType(TypeToken<LogOutCompleted>())
-        .where((action) => action.error == null)
-        .map((_) => null);
-
-    final userObservable =
-        Observable.merge([logInObservable, logOutObservable]);
+        .startWith(store.state.auth.user)
+        .where((u) => u != null);
 
     final tokenRefreshObservable = Observable(actions)
         .ofType(TypeToken<FCMTokenRefreshed>())
-        .where((action) => action.token != null)
-        .map((action) => action.token);
+        .map((action) => action.token)
+        .where((t) => t != null);
 
     final firstTokenObservable =
         Observable.fromFuture(firebaseMessaging.getToken());
@@ -65,11 +64,6 @@ Epic<AppState> onTokenRefreshEpic(
 
     return Observable.combineLatest2(userObservable, tokenObservable,
         (user, token) async {
-      if (user == null) {
-        return UserDataChanged(
-            error: "could not update fcm token -> user possibly not logged in");
-      }
-
       try {
         final ref = firestore.document("/users/${user.uid}");
         final userDoc = await ref.get();
