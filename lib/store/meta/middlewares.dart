@@ -68,6 +68,15 @@ _showToastMiddleware() {
           ));
         }
         break;
+      case PairingStateChanged:
+        final payload = action as PairingStateChanged;
+        if (payload.error != null) {
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text(action.error),
+            duration: Duration(seconds: 5),
+          ));
+        }
+        break;
       default:
     }
 
