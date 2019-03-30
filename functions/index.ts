@@ -155,7 +155,7 @@ exports.sendPushNotification = functions.https.onCall(async (data, context) => {
         const message = {
             notification: {
                 title: '🍺🍺🍺🍺🍺🍺',
-                body: 'test text',
+                sound: 'plop.mp3',
             },
         };
 
