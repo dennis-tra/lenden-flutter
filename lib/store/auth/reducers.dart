@@ -17,7 +17,7 @@ AuthState _authStateChanged(AuthState authState, AuthStateChanged action) {
       user: action.user,
       status: action.user == null ? Status.LoggedOut : Status.LoggedIn,
       process: authState.process == Process.Orienting
-          ? (action.error == null ? Process.Settled : Process.Failed)
+          ? Process.Settled
           : authState.process,
       error: action.error);
 }
@@ -41,9 +41,8 @@ AuthState _logIn(AuthState authState, LogIn action) {
 
 AuthState _logInCompleted(AuthState authState, LogInCompleted action) {
   if (action.error != null) {
-    return authState.copyWith(process: Process.Failed, error: action.error);
+    return authState.copyWith(error: action.error, process: Process.Settled);
   }
-  print(action.user.uid);
   return authState.copyWith(
       user: action.user, status: Status.LoggedIn, process: Process.Settled);
 }
@@ -54,7 +53,7 @@ AuthState _logOut(AuthState authState, LogOut action) {
 
 AuthState _logOutCompleted(AuthState authState, LogOutCompleted action) {
   if (action.error != null) {
-    return authState.copyWith(process: Process.Failed, error: action.error);
+    return authState.copyWith(error: action.error, process: Process.Settled);
   }
   return AuthState(status: Status.LoggedOut, process: Process.Settled);
 }

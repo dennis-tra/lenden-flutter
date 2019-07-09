@@ -1,7 +1,11 @@
 import 'package:lenden/models/user.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'state.g.dart';
 
 enum Status { Idle, Watching }
 
+@JsonSerializable()
 class UserState {
   final Status status;
   final Status fcmStatus;
@@ -28,8 +32,5 @@ class UserState {
     return UserState();
   }
 
-  @override
-  String toString() {
-    return "UserState{user: $user, status: $status, fcmStatus: $fcmStatus, error: $error}";
-  }
+  Map<String, dynamic> toJson() => _$UserStateToJson(this);
 }

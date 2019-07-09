@@ -17,7 +17,7 @@ List<Middleware<AppState>> createAuthMiddleware({FirebaseAuth firebaseAuth}) {
 _logInMiddleware(FirebaseAuth firebaseAuth) {
   return (Store<AppState> store, LogIn action, NextDispatcher next) {
     var process = store.state.auth.process;
-    if (process == Process.Settled || process == Process.Failed) {
+    if (process != Process.LoggingIn) {
       firebaseAuth.signInAnonymously().then((FirebaseUser user) {
         store.dispatch(LogInCompleted(user: user));
       }).catchError((error) {
@@ -32,7 +32,7 @@ _logInMiddleware(FirebaseAuth firebaseAuth) {
 _logOutMiddleware(FirebaseAuth firebaseAuth) {
   return (Store<AppState> store, LogOut action, NextDispatcher next) {
     var process = store.state.auth.process;
-    if (process == Process.Settled || process == Process.Failed) {
+    if (process != Process.LoggingIn) {
       FirebaseAuth.instance.signOut().then((_) {
         store.dispatch(LogOutCompleted());
       }).catchError((error) {

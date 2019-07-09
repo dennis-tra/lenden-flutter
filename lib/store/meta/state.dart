@@ -24,8 +24,12 @@ class MetaState {
     return MetaState();
   }
 
-  @override
-  String toString() {
-    return "MetaState{initState: $initState, audioPlayer: $audioPlayer, plopFilePath: $plopFilePath}";
-  }
+  Map<String, dynamic> toJson() => {
+    "initState": this.initState.toString(),
+    "plopFilePath": this.plopFilePath,
+    "audioPlayer": this.audioPlayer.toString(),
+  };
+
+  factory MetaState.fromJson(Map<String, dynamic> json) =>
+      MetaState.initialState();
 }

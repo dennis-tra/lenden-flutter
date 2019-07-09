@@ -3,7 +3,11 @@ import 'package:lenden/store/meta/state.dart';
 import 'package:lenden/store/prefs/state.dart';
 import 'package:lenden/store/user/state.dart';
 import 'package:lenden/store/pairing/state.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'state.g.dart';
+
+@JsonSerializable(explicitToJson: true, createFactory: false)
 class AppState {
   final AuthState auth;
   final UserState user;
@@ -41,4 +45,6 @@ class AppState {
   String toString() {
     return "AppState{auth: $auth, user: $user, prefs: $prefs, meta: $meta, pairing: $pairing}";
   }
+
+  Map<String, dynamic> toJson() => _$AppStateToJson(this);
 }

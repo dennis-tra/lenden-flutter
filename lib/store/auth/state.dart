@@ -1,4 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:lenden/utils/json_serializers.dart';
+
+part 'state.g.dart';
 
 enum Status { LoggedIn, LoggedOut, Unknown }
 enum Process {
@@ -9,12 +13,12 @@ enum Process {
   // the users authentication state is unknown and we need to find out the state
   Orienting,
   // the users state is settled usually on LoggedIn or LoggedOut and we are not attempting to do anything at the moment
-  Settled,
-  // Same as Settled but the last log in or log out attempt failed
-  Failed
+  Settled
 }
 
+@JsonSerializable()
 class AuthState {
+  @JsonKey(toJson: firebaseUserToJson, fromJson: firebaseUserFromJson)
   final FirebaseUser user;
   final Status status;
   final Process process;
@@ -40,8 +44,5 @@ class AuthState {
     return AuthState();
   }
 
-  @override
-  String toString() {
-    return "AuthState{user: $user, status: $status, process: $process, error: $error}";
-  }
+  Map<String, dynamic> toJson() => _$AuthStateToJson(this);
 }

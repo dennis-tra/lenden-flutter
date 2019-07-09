@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'state.g.dart';
+
 enum Status { Unknown, Loading, Loaded, Failed }
 
+@JsonSerializable()
 class PrefsState {
   final int launchCount;
   final Status status;
@@ -19,8 +24,5 @@ class PrefsState {
     return PrefsState();
   }
 
-  @override
-  String toString() {
-    return "PrefsState{launchCount: $launchCount, status: $status, error: $error}";
-  }
+  Map<String, dynamic> toJson() => _$PrefsStateToJson(this);
 }

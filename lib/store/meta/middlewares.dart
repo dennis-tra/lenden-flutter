@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 List<Middleware<AppState>> createMetaMiddleware() {
   return [
     TypedMiddleware<AppState, PlayPlopSound>(_playPlopSoundMiddleware()),
-    TypedMiddleware<AppState, InitAudioplayer>(_initAudioplayerMiddleware()),
+    TypedMiddleware<AppState, InitAudioplayer>(_initAudioplayerMiddleware2()),
     _showToastMiddleware(),
   ];
 }
@@ -101,6 +101,34 @@ _initAudioplayerMiddleware() {
       audioPlayer: audioPlayer,
       plopFile: plopFile.path,
     ));
+    next(action);
+  };
+}
+
+_initAudioplayerMiddleware2() {
+  return (Store<AppState> store, InitAudioplayer action, NextDispatcher next) {
+    final AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+    File plopFile;
+
+    getTemporaryDirectory()
+        .then((tmpDir) {
+          plopFile = File('${tmpDir.path}/plop.mp3');
+          return rootBundle.load('assets/plop.mp3');
+        })
+        .then((plopAsset) =>
+            plopFile.writeAsBytes(plopAsset.buffer.asUint8List()))
+        .then((_) {
+          audioPlayer.play(plopFile.path, isLocal: true, volume: 0.0);
+          store.dispatch(InitAudioplayerCompleted(
+            audioPlayer: audioPlayer,
+            plopFile: plopFile.path,
+          ));
+        })
+        .catchError((err) => store.dispatch(InitAudioplayerCompleted(
+              audioPlayer: audioPlayer,
+              plopFile: plopFile.path,
+            )));
+
     next(action);
   };
 }

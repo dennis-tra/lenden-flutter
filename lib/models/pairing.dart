@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'pairing.g.dart';
+
+@JsonSerializable()
 class Pairing {
   // list of the IDs of paired users
   final List<String> userIds;
@@ -20,4 +24,8 @@ class Pairing {
   String toString() {
     return "Pairing{userIds: $userIds}";
   }
+
+  Map<String, dynamic> toJson() => _$PairingToJson(this);
+  factory Pairing.fromJson(Map<String, dynamic> json) =>
+      _$PairingFromJson(json);
 }

@@ -1,4 +1,7 @@
 import 'package:lenden/models/pairing.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'state.g.dart';
 
 enum Status { Idle, Watching }
 enum Process {
@@ -12,6 +15,7 @@ enum Process {
   Settled,
 }
 
+@JsonSerializable()
 class PairingState {
   final Status status;
   final Process process;
@@ -38,8 +42,5 @@ class PairingState {
     return PairingState();
   }
 
-  @override
-  String toString() {
-    return "PairingState{status: $status, process: $process, pairing: $pairing, error: $error}";
-  }
+  Map<String, dynamic> toJson() => _$PairingStateToJson(this);
 }

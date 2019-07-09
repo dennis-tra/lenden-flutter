@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user.g.dart';
+
+@JsonSerializable()
 class User {
   final String fcmToken;
 
@@ -19,4 +24,7 @@ class User {
   String toString() {
     return "User{fcmToken: $fcmToken}";
   }
+
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
