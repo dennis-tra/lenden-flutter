@@ -11,7 +11,7 @@ class HomePaired extends StatelessWidget {
   _send(Store<AppState> store) async {
     try {
       store.dispatch(PlayPlopSound());
-      await CloudFunctions.instance.call(functionName: 'sendPushNotification');
+      await CloudFunctions.instance.getHttpsCallable(functionName: 'sendPushNotification').call();
     } catch (e) {
       print(e);
     }
