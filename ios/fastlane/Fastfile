@@ -26,7 +26,7 @@ platform :ios do
     Dir.chdir "../.." do
       sh("flutter", "packages", "get")
       sh("flutter", "clean")
-      sh("flutter", "build", "ios", "--release", "--no-codesign", "--build-number=#{build_number}")
+      sh("flutter", "build", "ios", "--release", "--no-codesign", "--build-number=#{build_number}", "-t", "lib/main_beta.dart")
     end
 
     build_app(workspace: "Runner.xcworkspace", scheme: "Runner")

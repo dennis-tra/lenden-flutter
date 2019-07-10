@@ -21,20 +21,54 @@ import 'package:redux_remote_devtools/redux_remote_devtools.dart';
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async {
-  var remoteDevtools = RemoteDevToolsMiddleware('localhost:8000');
+enum Environment { DEV, BETA, PRODUCTION }
 
-  final store = DevToolsStore<AppState>(
-    appReducer,
-    initialState: AppState.initialState(),
-    middleware: []
-      ..add(EpicMiddleware(appEpics))
-      ..addAll(appMiddlewares())
-      ..add(remoteDevtools),
-  );
-  remoteDevtools.store = store;
+class Configuration {
+  final Environment env;
 
-  await remoteDevtools.connect();
+  Configuration({this.env});
+}
+
+void main() {
+  final config = Configuration(env: Environment.DEV);
+  return start(config);
+}
+
+void start(Configuration config) async {
+  var remoteDevTools = RemoteDevToolsMiddleware('localhost:8000');
+
+  List<Middleware<AppState>> middlewares = []
+    ..add(EpicMiddleware(appEpics))
+    ..addAll(appMiddlewares());
+
+  Store store;
+  switch (config.env) {
+    case Environment.DEV:
+      store = DevToolsStore<AppState>(
+        appReducer,
+        initialState: AppState.initialState(),
+        middleware: middlewares..add(remoteDevTools),
+      );
+      remoteDevTools.store = store;
+
+      await remoteDevTools.connect();
+      break;
+
+    case Environment.BETA:
+      store = Store<AppState>(
+        appReducer,
+        initialState: AppState.initialState(),
+        middleware: middlewares,
+      );
+      break;
+    case Environment.PRODUCTION:
+      store = Store<AppState>(
+        appReducer,
+        initialState: AppState.initialState(),
+        middleware: middlewares,
+      );
+      break;
+  }
 
   store.dispatch(LoadPreferences());
   store.dispatch(StartObservingAuthState());
