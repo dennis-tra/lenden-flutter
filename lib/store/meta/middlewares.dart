@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 List<Middleware<AppState>> createMetaMiddleware() {
   return [
     TypedMiddleware<AppState, PlayPlopSound>(_playPlopSoundMiddleware()),
-    TypedMiddleware<AppState, InitAudioplayer>(_initAudioplayerMiddleware2()),
+    TypedMiddleware<AppState, InitAudioplayer>(_initAudioplayerMiddleware()),
     _showToastMiddleware(),
   ];
 }
@@ -85,27 +85,6 @@ _showToastMiddleware() {
 }
 
 _initAudioplayerMiddleware() {
-  return (Store<AppState> store, InitAudioplayer action,
-      NextDispatcher next) async {
-    final AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-
-    final tmpDir = await getTemporaryDirectory();
-    final plopFile = File('${tmpDir.path}/plop.mp3');
-    final plopAsset = await rootBundle.load('assets/plop.mp3');
-
-    await plopFile.writeAsBytes(plopAsset.buffer.asUint8List());
-
-    audioPlayer.play(plopFile.path, isLocal: true, volume: 0.0);
-
-    store.dispatch(InitAudioplayerCompleted(
-      audioPlayer: audioPlayer,
-      plopFile: plopFile.path,
-    ));
-    next(action);
-  };
-}
-
-_initAudioplayerMiddleware2() {
   return (Store<AppState> store, InitAudioplayer action, NextDispatcher next) {
     final AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
     File plopFile;
@@ -115,8 +94,7 @@ _initAudioplayerMiddleware2() {
           plopFile = File('${tmpDir.path}/plop.mp3');
           return rootBundle.load('assets/plop.mp3');
         })
-        .then((plopAsset) =>
-            plopFile.writeAsBytes(plopAsset.buffer.asUint8List()))
+        .then((plopAsset) => plopFile.writeAsBytes(plopAsset.buffer.asUint8List()))
         .then((_) {
           audioPlayer.play(plopFile.path, isLocal: true, volume: 0.0);
           store.dispatch(InitAudioplayerCompleted(
@@ -134,8 +112,7 @@ _initAudioplayerMiddleware2() {
 }
 
 _playPlopSoundMiddleware() {
-  return (Store<AppState> store, PlayPlopSound action,
-      NextDispatcher next) async {
+  return (Store<AppState> store, PlayPlopSound action, NextDispatcher next) {
     final audioPlayer = store.state.meta.audioPlayer;
     final plopFilePath = store.state.meta.plopFilePath;
 

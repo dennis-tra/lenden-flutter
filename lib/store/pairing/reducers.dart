@@ -50,6 +50,14 @@ PairingState _unpair(PairingState pairingState, Unpair action) {
 
 PairingState _unpairCompleted(
     PairingState pairingState, UnpairCompleted action) {
+  if (action.error != null) {
+    return PairingState(
+        pairing: pairingState.pairing,
+        error: action.error,
+        status: pairingState.status,
+        process: Process.Settled);
+  }
+
   return PairingState(
       pairing: null,
       error: action.error,

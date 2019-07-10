@@ -105,29 +105,15 @@ class _FavouriteButtonState extends State<FavouriteButton>
       child: Container(
         child: Opacity(
           opacity: _opacity,
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Container(
-                width: 160.0,
-                height: 160.0,
-              ),
-              // ScaleTransition(
-              //   scale: _circleAnimation,
-              //   child: Container(
-              //     width: 160.0,
-              //     height: 160.0,
-              //     decoration: BoxDecoration(
-              //       color: Colors.blue,
-              //       shape: BoxShape.circle,
-              //     ),
-              //   ),
-              // ),
-              ScaleTransition(
+          child: Container(
+            width: 160.0,
+            height: 160.0,
+            child: CustomPaint(
+              child: ScaleTransition(
                 scale: _imageAnimation,
                 child: _image,
               ),
-            ],
+            ),
           ),
         ),
       ),
