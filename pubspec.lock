@@ -448,12 +448,10 @@ packages:
   redux_remote_devtools:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: ba3c5b102147c3f974cd42b48e65c788dc7aa12e
-      url: "https://github.com/dennis-tra/dart-redux-remote-devtools.git"
-    source: git
-    version: "0.0.8"
+      name: redux_remote_devtools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.9"
   rxdart:
     dependency: "direct main"
     description:
