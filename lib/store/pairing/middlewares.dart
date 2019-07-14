@@ -26,7 +26,7 @@ _pairMiddleware(CloudFunctions cloudFunctions) {
       final pairingData = {"uid": action.uid};
 
       CloudFunctions.instance.getHttpsCallable(functionName: 'pairUsers')
-          .call([pairingData])
+          .call(pairingData)
           .then((dynamic response) {
         final _firebaseMessaging = FirebaseMessaging();
         _firebaseMessaging.configure(
