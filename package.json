@@ -14,7 +14,8 @@
     "deploy:functions": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test:rules": "npm run build && FIREBASE_FIRESTORE_EMULATOR_ADDRESS='127.0.0.1:8080' mocha --opts ./rules/mocha.opts",
-    "deploy:rules": "firebase deploy --only firestore:rules"
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "deploy:all": "npm run deploy:functions && npm run deploy:rules"
   },
   "devDependencies": {
     "@firebase/app-types": "^0.4.0",
