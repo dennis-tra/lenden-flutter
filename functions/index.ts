@@ -10,6 +10,8 @@ firestore.settings({ timestampsInSnapshots: true });
 
 exports.pairUsers = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
+    console.error("The pairing function must be called while authenticated.");
+
     throw new functions.https.HttpsError(
       "failed-precondition",
       "The pairing function must be called while authenticated."
@@ -23,6 +25,10 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
   const paireeUID = data.uid;
 
   if (!(typeof paireeUID === "string") || paireeUID.length === 0) {
+    console.error(
+      'The function must be called with one arguments "uid" containing the user id of the user you want to pair with.'
+    );
+
     throw new functions.https.HttpsError(
       "invalid-argument",
       'The function must be called with one arguments "uid" containing the user id of the user you want to pair with.'
@@ -39,6 +45,10 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
   try {
     await admin.auth().getUser(paireeUID);
   } catch (error) {
+    console.error(
+      "The provided user id could not be retrieved or found in the database."
+    );
+
     throw new functions.https.HttpsError(
       "not-found",
       "The provided user id could not be retrieved or found in the database."
@@ -64,6 +74,8 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
     .get();
 
   if (!pairingsOfPairer.empty) {
+    console.error("You are already paired with another user.");
+
     throw new functions.https.HttpsError(
       "failed-precondition",
       "You are already paired with another user."
@@ -75,6 +87,10 @@ exports.pairUsers = functions.https.onCall(async (data, context) => {
     .get();
 
   if (!pairingsOfPairee.empty) {
+    console.error(
+      "The user you want to be paired with is already paired with another user."
+    );
+
     throw new functions.https.HttpsError(
       "failed-precondition",
       "The user you want to be paired with is already paired with another user."
