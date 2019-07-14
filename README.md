@@ -19,3 +19,18 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our 
 [online documentation](https://flutter.io/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
+
+## Debugging with Redux Remote Dev Tools
+
+Use the Javascript Remote Devtools package. Start the remotedev server on your machine
+```shell
+npm install -g remotedev-server
+remotedev --port 8000
+```
+Run the application. It will connect to the remotedev server. You can now debug your redux application by opening up http://localhost:8000 in a web browser.
+
+## Generating JSON serializations
+To make use of the JSON annotations (decorators) run the following command:
+```shell
+flutter pub run build_runner build
+```
