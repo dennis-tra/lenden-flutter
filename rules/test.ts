@@ -15,20 +15,19 @@ const testUserId1 = "alice";
 const testUserId2 = "bob";
 
 const testUserData1 = {
-  "fcmToken": "TEST_FCM_TOKEN_1",
+  fcmToken: "TEST_FCM_TOKEN_1"
 };
 const testUserData2 = {
-  "fcmToken": "TEST_FCM_TOKEN_2",
+  fcmToken: "TEST_FCM_TOKEN_2"
 };
 
-const testPairingsId = "testpairingid"
+const testPairingsId = "testpairingid";
 const testPairingsData = {
-  "user_ids": {
+  user_ids: {
     [testUserId1]: true,
     [testUserId2]: true
   }
-}
-
+};
 
 // Run each test in its own project id to make it independent.
 let testNumber = 0;
@@ -57,7 +56,6 @@ function authedApp(auth) {
     .firestore();
 }
 
-
 /**
  * Creates a new app with admin privileges.
  *
@@ -66,7 +64,7 @@ function authedApp(auth) {
 function adminApp() {
   return firebase
     .initializeAdminApp({
-      projectId: getProjectId(),
+      projectId: getProjectId()
     })
     .firestore();
 }
@@ -98,7 +96,6 @@ class TestingBase {
  */
 @suite
 class LendenUserCreate extends TestingBase {
-
   @test
   async "require users to log in before creating user data"() {
     const db = authedApp(null);
@@ -115,7 +112,6 @@ class LendenUserCreate extends TestingBase {
     await firebase.assertFails(profile.set(testUserData1));
   }
 
-
   @test
   async "should deny empty data"() {
     const db = authedApp({ uid: testUserId1 });
@@ -129,19 +125,23 @@ class LendenUserCreate extends TestingBase {
     const db = authedApp({ uid: testUserId1 });
     const ref = db.collection("users").doc(testUserId1);
 
-    await firebase.assertFails(ref.set({
-      ...testUserData1,
-      "fcmToken": "",
-    }));
+    await firebase.assertFails(
+      ref.set({
+        ...testUserData1,
+        fcmToken: ""
+      })
+    );
 
     const noFCM = { ...testUserData1 };
-    delete noFCM.fcmToken
+    delete noFCM.fcmToken;
     await firebase.assertFails(ref.set(noFCM));
 
-    await firebase.assertSucceeds(ref.set({
-      ...testUserData1,
-      "fcmToken": null,
-    }));
+    await firebase.assertSucceeds(
+      ref.set({
+        ...testUserData1,
+        fcmToken: null
+      })
+    );
   }
 }
 
@@ -152,10 +152,10 @@ class LendenUserRead extends TestingBase {
 
     const db = adminApp();
     const ref1 = db.collection("users").doc(testUserId1);
-    await ref1.set(testUserData1)
+    await ref1.set(testUserData1);
 
     const ref2 = db.collection("users").doc(testUserId2);
-    await ref2.set(testUserData2)
+    await ref2.set(testUserData2);
   }
 
   @test
@@ -183,7 +183,6 @@ class LendenUserRead extends TestingBase {
   }
 }
 
-
 @suite
 class LendenUserUpdate extends TestingBase {
   async before() {
@@ -191,10 +190,10 @@ class LendenUserUpdate extends TestingBase {
 
     const db = adminApp();
     const ref1 = db.collection("users").doc(testUserId1);
-    await ref1.set(testUserData1)
+    await ref1.set(testUserData1);
 
     const ref2 = db.collection("users").doc(testUserId2);
-    await ref2.set(testUserData2)
+    await ref2.set(testUserData2);
   }
 
   @test
@@ -220,16 +219,20 @@ class LendenUserUpdate extends TestingBase {
     const db = authedApp({ uid: testUserId1 });
     const ref = db.collection("users").doc(testUserId1);
 
-    await firebase.assertFails(ref.update({
-      foo1: "bar",
-      foo2: "bar",
-      foo3: "bar",
-    }));
+    await firebase.assertFails(
+      ref.update({
+        foo1: "bar",
+        foo2: "bar",
+        foo3: "bar"
+      })
+    );
 
-    await firebase.assertFails(ref.update({
-      ...testUserData1,
-      foo: "bar",
-    }));
+    await firebase.assertFails(
+      ref.update({
+        ...testUserData1,
+        foo: "bar"
+      })
+    );
   }
 
   @test
@@ -240,19 +243,25 @@ class LendenUserUpdate extends TestingBase {
     const adminDb = adminApp();
     const ref1 = adminDb.collection("users").doc("noFCM");
     const noFCM = { ...testUserData1, fcmToken: null };
-    await ref1.set(noFCM)
+    await ref1.set(noFCM);
 
-    await firebase.assertFails(ref.update({
-      fcmToken: "",
-    }));
+    await firebase.assertFails(
+      ref.update({
+        fcmToken: ""
+      })
+    );
 
-    await firebase.assertSucceeds(ref.update({
-      fcmToken: "FCM_TOKEN_2",
-    }));
+    await firebase.assertSucceeds(
+      ref.update({
+        fcmToken: "FCM_TOKEN_2"
+      })
+    );
 
-    await firebase.assertSucceeds(ref.update({
-      fcmToken: null,
-    }));
+    await firebase.assertSucceeds(
+      ref.update({
+        fcmToken: null
+      })
+    );
   }
 }
 
@@ -263,7 +272,7 @@ class LendenPairingsReadList extends TestingBase {
 
     const db = adminApp();
     const ref = db.collection("pairings").doc(testPairingsId);
-    await ref.set(testPairingsData)
+    await ref.set(testPairingsData);
   }
 
   @test
@@ -292,12 +301,13 @@ class LendenPairingsReadList extends TestingBase {
   @test
   async "users can list their own pairings"() {
     const db = authedApp({ uid: testUserId1 });
-    const ref = db.collection("pairings").where(`user_ids.${testUserId1}`, "==", true);
+    const ref = db
+      .collection("pairings")
+      .where(`user_ids.${testUserId1}`, "==", true);
 
     await firebase.assertSucceeds(ref.get());
   }
 }
-
 
 @suite
 class LendenPairingsDelete extends TestingBase {
@@ -306,16 +316,16 @@ class LendenPairingsDelete extends TestingBase {
 
     const db = adminApp();
     const ref = db.collection("pairings").doc(testPairingsId);
-    await ref.set(testPairingsData)
+    await ref.set(testPairingsData);
 
     const ref2 = db.collection("pairings").doc("other-pairing-id");
     await ref2.set({
       ...testPairingsData,
-      "user_ids": {
+      user_ids: {
         "other-user-1": "other-user-id-1",
-        "other-user-2": "other-user-id-2",
+        "other-user-2": "other-user-id-2"
       }
-    })
+    });
   }
 
   @test
@@ -341,5 +351,4 @@ class LendenPairingsDelete extends TestingBase {
 
     await firebase.assertFails(ref.delete());
   }
-
 }
